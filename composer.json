@@ -2,7 +2,7 @@
     "name": "plainphp/core-package",
     "type": "plainphp-package",
     "require": {
-        "plainphp/package-installer": "dev-main"
+        "plainphp/package-installer": "dev-develop"
     },
     "keywords": ["plainphp", "framework", "package"]
 }
