@@ -5,7 +5,7 @@
 
 // Force the PATH_INFO to be consistent in different environments
 $_SERVER['PATH_INFO'] = @$_GET['_url'] ?: '/';
-@unset($_GET['_url']);
+unset(@$_GET['_url']);
 
 // Require env specific config
 require __DIR__.'/../../env/env.php';
