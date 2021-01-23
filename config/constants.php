@@ -9,7 +9,7 @@ define('IS_DEV', @$_ENV['IS_DEV']);
 define('ROOT', realpath(__DIR__ . '/../..'));
 
 // Public path
-define('PUBLIC', ROOT.'/public');
+define('PUB', ROOT.'/public');
 
 // The URL of the homepage
 define('BASE_URL', rtrim(@$_ENV['BASE_URL'], '/') . '/');

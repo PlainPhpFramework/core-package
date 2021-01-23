@@ -55,25 +55,31 @@ $controllerUri = ltrim($controllerUri, '/');
 $controller = dirname($controllerUri);
 $method = basename($controllerUri);
 if ($controller === '.') {
-    $controller = 'default';
+    $controller = 'def';
 }
 $controller = 'App\\Controller\\'.$controller;
 
 // Dispatch to the controller method is it exists otherwise display and error 404
-if (class_exists($controller) && is_callable([$controller, $method])) {
+if (class_exists($controller) && method_exists($controller, $method)) {
 
     // Merge the rewritten parameters to the query string
     if (@$query) {
         parse_str($query, $params);
         $_GET = $params + @$_GET;
     }
-    (new $controller)->{$method}();
+    // Inizialize the controller
+    $controller = new $controller;
+    // Check if the action is callable
+    if (is_callable([$controller, $method])) {
+        (new $controller)->{$method}();
+        die;
+    }
 } 
-else {
-    abort(exception: new Exception(sprintf(
-        'Action not found. Controller %s: %s, Action: %s: %s', 
-        $controller,
-        var_export(class_exists($controller), true),
-        $method,
-        var_export(is_callable([$controller, $method]), true))));
-}
+
+// Something wrong: return a 404 error page
+abort(exception: new Exception(sprintf(
+    'Action not found. Controller %s: %s, Action: %s: %s', 
+    is_object($controller)? $controller::class : $controller,
+    var_export(class_exists($controller), true),
+    $method,
+    var_export(is_callable([$controller, $method]), true))));

@@ -5,16 +5,16 @@
 
 // Force the PATH_INFO to be consistent in different environments
 $_SERVER['PATH_INFO'] = @$_GET['_url'] ?: '/';
-unset(@$_GET['_url']);
+unset($_GET['_url']);
 
 // Require env specific config
-require __DIR__.'/../../env/env.php';
+@include __DIR__.'/../../env/env.php';
 
 // Set up some constants
 require 'config/constants.php';
 
 // Load the composer autoloader
-require 'config/autoload.php';
+$loader = require 'config/autoload.php';
 
 // Set up the error handling
 require 'config/errors.php';
