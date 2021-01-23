@@ -1,0 +1,8 @@
+{
+    "name": "plainphp/core-package",
+    "type": "plainphp-package",
+    "require": {
+        "plainphp/package-installer": "dev-main"
+    },
+    "keywords": ["plainphp", "framework", "package"]
+}
