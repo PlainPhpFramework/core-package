@@ -2,6 +2,7 @@
 /**
  * Dispatch the request to the controller or display a 404 error page
  */
+use pp\Hook;
 
 Hook::trigger('dispatch_start');
 
