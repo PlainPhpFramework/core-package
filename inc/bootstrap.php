@@ -2,6 +2,7 @@
 /**
  * Bootstrap the app
  */
+use pp\Hook;
 
 // Force the PATH_INFO to be consistent in different environments
 $_SERVER['PATH_INFO'] = @$_GET['_url'] ?: '/';
@@ -60,3 +61,5 @@ if (php_sapi_name() !== 'cli') {
 
 // Initialize the "template engine"
 ob_start();
+
+Hook::trigger('bootstrap_end');

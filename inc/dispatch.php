@@ -3,6 +3,8 @@
  * Dispatch the request to the controller or display a 404 error page
  */
 
+Hook::trigger('dispatch_start');
+
 // User defined rules
 $rewrites = require 'config/routing.php';
 
@@ -55,9 +57,10 @@ $controllerUri = ltrim($controllerUri, '/');
 $controller = dirname($controllerUri);
 $method = basename($controllerUri);
 if ($controller === '.') {
-    $controller = 'def';
+    $controller = 'default';
 }
-$controller = 'App\\Controller\\'.$controller;
+$controller = 'App\\Controller\\'.$controller.'_http';
+
 
 // Dispatch to the controller method is it exists otherwise display and error 404
 if (class_exists($controller) && method_exists($controller, $method)) {
@@ -67,14 +70,19 @@ if (class_exists($controller) && method_exists($controller, $method)) {
         parse_str($query, $params);
         $_GET = $params + @$_GET;
     }
-    // Inizialize the controller
+
+    // Initialize the controller
     $controller = new $controller;
+
     // Check if the action is callable
     if (is_callable([$controller, $method])) {
-        (new $controller)->{$method}();
+        (new $controller)->{$method}();  
+        Hook::trigger('dispatch_success');
         die;
     }
-} 
+}
+
+Hook::trigger('dispatch_error');
 
 // Something wrong: return a 404 error page
 abort(exception: new Exception(sprintf(
