@@ -59,7 +59,14 @@ if (php_sapi_name() !== 'cli') {
 
 }
 
+// Load the hooks
+require 'config/hooks.php';
+foreach (glob(ROOT.'/packages/hooks/*.php') as $hook) {
+    require 'hooks/'.basename($hook);
+}
+
 // Initialize the "template engine"
 ob_start();
 
+// Trigger an hook
 Hook::trigger('bootstrap_end');

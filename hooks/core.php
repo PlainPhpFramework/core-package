@@ -10,10 +10,10 @@ Hook::$on['dispatch_success'][] = function () {
 
 	if (http_response_code() === 200) {
 
-		$etag = '"'.md5(ob_get_clean()).'"';
-		$userEtag = $_SERVER['HTTP_IF_NONE_MATCH']?: false;
-
+		$etag = '"'.md5(ob_get_contents()).'"';
+		$userEtag = @$_SERVER['HTTP_IF_NONE_MATCH']?: false;
 		header("ETag: $etag");
+		header("Cache-Control: private, must-revalidate");
 
 		if ($userEtag && $userEtag === $etag) {
 			http_response_code(304);
