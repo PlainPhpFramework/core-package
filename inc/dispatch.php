@@ -54,11 +54,15 @@ elseif (substr($_SERVER['PATH_INFO'], -5) === 'index') {
 
 
 // Convert the URI to a controller and method
+$defaultControllerName = 'default_controller';
 $controllerUri = ltrim($controllerUri, '/');
 $controller = dirname($controllerUri);
 $method = basename($controllerUri);
-if ($controller === '.') {
-    $controller = 'default';
+if ($controller === $defaultControllerName) {
+    abort(exception: new Exception(sprintf('Explicit call to the default controller name is not allowed')));
+}
+elseif ($controller === '.') {
+    $controller = $defaultControllerName;
 }
 $controller = 'App\\Controller\\'.$controller;
 
