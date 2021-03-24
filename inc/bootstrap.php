@@ -65,6 +65,9 @@ foreach (glob(ROOT.'/packages/hooks/*.php') as $hook) {
     require 'hooks/'.basename($hook);
 }
 
+// Set up the locale
+require 'config/locale.php';
+
 // Initialize the "template engine"
 ob_start();
 
