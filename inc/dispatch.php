@@ -60,14 +60,16 @@ $method = basename($controllerUri);
 if ($controller === '.') {
     $controller = 'default';
 }
-$controller = 'App\\Controller\\'.$controller.'_http';
+$controller = 'App\\Controller\\'.$controller;
 
 
-// Dispatch to the controller method is it exists otherwise display and error 404
+// Dispatch to the controller method if it exists otherwise display and error 404
 if (
     class_exists($controller) 
     && method_exists($controller, $method)
-    && (new ReflectionClass($controller))->getMethod($method)->isPublic()
+    && ($ref = new ReflectionClass($controller))
+    && $ref->isInstantiable() // The class is not abstract
+    && $ref->getMethod($method)->isPublic() // The method is public
 ) {
 
     // Merge the rewritten parameters to the query string
