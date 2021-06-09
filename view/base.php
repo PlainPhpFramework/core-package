@@ -1,4 +1,4 @@
-<?php $content = ob_get_clean(); ob_start() ?>
+<?php $content = get_ob() ?>
 <!doctype html>
 <html class="no-js" lang="<?=@$lang ?: 'en'?>">
 <head>

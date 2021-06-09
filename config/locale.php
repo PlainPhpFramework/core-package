@@ -7,7 +7,7 @@ namespace App;
  */
 function setLocale($locale) {
 
-	defined('LC_MESSAGES') && setlocale(LC_MESSAGES, $locale); // Linux
+	defined('LC_MESSAGES') && \setlocale(LC_MESSAGES, $locale); // Linux
 	putenv("LC_ALL={$locale}"); // windows
 	bindtextdomain("messages", APP."/locale");
 	textdomain("messages");
