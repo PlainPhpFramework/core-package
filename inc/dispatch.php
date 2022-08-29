@@ -6,11 +6,20 @@ use pp\Hook;
 
 Hook::trigger('dispatch_start');
 
-// User defined rules
-$rewrites = require 'config/routing.php';
+// Routing config
+$config = require 'config/routing.php';
 
 // Controller URI
 $controllerUri = $_SERVER['PATH_INFO'];
+
+// Avoid the explicit call of the default controller
+if (strpos($_SERVER['PATH_INFO'], '/'.ltrim($config->default_controller, '/')) === 0) {
+    abort(exception: new Exception(sprintf('Explicit call to the default controller name is not allowed')));
+}
+// Avoid the explicit call of the default action
+elseif (substr($_SERVER['PATH_INFO'], (strlen($config->default_action)+1)*-1) === '/'.$config->default_action) {
+    abort(exception: new Exception(sprintf('Explicit call to the index action: %s', $_SERVER['PATH_INFO'])));
+}
 
 // In the case of requests to rewritten controllers, try redirecting to the new canonical URL 
 try {
@@ -19,52 +28,75 @@ try {
     if ($canonicalControllerUri !== $controllerUri) {
         redirect($canonical, 301);
     }
-} catch (Exception $e) {}
+} catch (Throwable $e) {}
 
 
 // URL rewriting
-$query = '';
-foreach ($rewrites as $pattern => $rule) {
-    // The replacement is the first element of the routing rule
-    $replacement = $rule[0];
-    $rewrittenUri = preg_replace("#^$pattern$#", $replacement, $controllerUri);
-    // A rule is matching
-    if ($rewrittenUri !== $controllerUri) {
-        // Update controllerUri and query string
-        $rewrittenUri = parse_url($controllerUri);
-        $controllerUri = @$rewrittenUri['path'];
-        $query = @$rewrittenUri['query'];
+$params = [];
+
+// Set up the regexes for the params
+$paramReplaces['~:@\baction\b~'] = '(?<_action_>[a-z0-9_]+)';
+foreach ($config->params as $key => $regex) {
+    $paramReplaces['~:\b'.$key.'\b~'] = "(?<$key>$regex)";
+}
+
+foreach ($config->routes as $pattern => $internalUri) {
+
+    // Check if pattern contains a param
+    // If any convert params to regexes
+    if (strpos($pattern, ':') !== false) {
+        $pattern = preg_replace(array_keys($paramReplaces), $paramReplaces, $pattern);
+    }
+
+    if (preg_match("#^$pattern$#", $controllerUri, $match)) {
+
+        $controllerUri = '/'.ltrim($internalUri, '/');
+
+        foreach ($match as $key => $string) {
+            if (!is_numeric($key)) {
+                $params[$key] = $string;
+            }
+        }
+
+        if (@$params['_action_']) {
+            $controllerUri = rtrim($controllerUri, '/') . '/' . $params['_action_'];
+        }
+
+        // Request match, exit the loop
         break;
+
+    }
+
+}
+
+// Validate the query string
+foreach ($_GET as $key => $value) {
+    if (isset($config->params[$key])) {
+        $rule = $config->params[$key];
+        if (!preg_match("#^$rule$#", $value)) {
+            abort(exception: new Exception(sprintf('Invalid parameter in query string key: %s', $key)));
+        }
     }
 }
 
 
 // Validate the controller URI
-if (!preg_match('#^[a-z0-9_/]+$#', $controllerUri)) {
+if (!preg_match('#^/([a-z0-9][a-z0-9_/]*)?$#', $controllerUri)) {
     abort(exception: new Exception(sprintf('Invalid controller URI: %s', $controllerUri)));
 } 
-// Add the implicit call to the index action
+// Add the implicit call to the default action
 elseif (!$controllerUri || substr($controllerUri, -1) === '/') {
-    $controllerUri .= 'index';
+    $controllerUri .= $config->default_action;
 }
-// Avoid the explicit call to the index action
-elseif (substr($_SERVER['PATH_INFO'], -5) === 'index') {
-    abort(exception: new Exception(sprintf('Explicit call to the index action: %s', $_SERVER['PATH_INFO'])));
-}
-
 
 // Convert the URI to a controller and method
-$defaultControllerName = 'default_controller';
 $controllerUri = ltrim($controllerUri, '/');
 $controller = dirname($controllerUri);
 $method = basename($controllerUri);
-if ($controller === $defaultControllerName) {
-    abort(exception: new Exception(sprintf('Explicit call to the default controller name is not allowed')));
+if ($controller === '.') {
+    $controller = $config->default_controller;
 }
-elseif ($controller === '.') {
-    $controller = $defaultControllerName;
-}
-$controller = 'App\\Controller\\'.$controller;
+$controller = sprintf($config->controller_class_pattern, $controller);
 
 
 // Dispatch to the controller method if it exists otherwise display and error 404
@@ -77,15 +109,15 @@ if (
 ) {
 
     // Merge the rewritten parameters to the query string
-    if (@$query) {
-        parse_str($query, $params);
+    if (@$params) {
         $_GET = $params + @$_GET;
     }
 
+    Hook::trigger('before_dispatch');
     // Initialize the controller
     $controller = new $controller;
     $controller->{$method}();  
-    Hook::trigger('dispatch_success');
+    Hook::trigger('after_dispatch');
     die;
 
 }

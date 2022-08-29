@@ -9,7 +9,7 @@ $_SERVER['PATH_INFO'] = @$_GET['_url'] ?: '/';
 unset($_GET['_url']);
 
 // Require env specific config
-@include __DIR__.'/../../env/env.php';
+@include __DIR__.'/../../.env/env.php';
 
 // Set up some constants
 require 'config/constants.php';
@@ -61,7 +61,7 @@ if (php_sapi_name() !== 'cli') {
 
 // Load the hooks
 require 'config/hooks.php';
-foreach (glob(ROOT.'/packages/hooks/*.php') as $hook) {
+foreach (array_merge(glob(ROOT.'/packages/hooks/*.php'), glob(ROOT.'/app/hooks/*.php')) as $hook) {
     require 'hooks/'.basename($hook);
 }
 
