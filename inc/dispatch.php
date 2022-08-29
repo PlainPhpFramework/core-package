@@ -97,7 +97,7 @@ if ($controller === '.') {
     $controller = $config->default_controller;
 }
 $controller = sprintf($config->controller_class_pattern, $controller);
-
+$method .= '_http';
 
 // Dispatch to the controller method if it exists otherwise display and error 404
 if (
