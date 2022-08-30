@@ -8,8 +8,17 @@ use pp\Hook;
 $_SERVER['PATH_INFO'] = @$_GET['_url'] ?: '/';
 unset($_GET['_url']);
 
+// Document root
+define('ROOT', realpath(__DIR__ . '/../../../..'));
+
+// App path
+define('APP', ROOT.'/app');
+
+// Public path
+define('PUB', ROOT.'/public');
+
 // Require env specific config
-@include __DIR__.'/../../.env/env.php';
+@include ROOT.'/.env/env.php';
 
 // Set up some constants
 require 'config/constants.php';
@@ -26,7 +35,7 @@ ini_set('log_errors', 'On');
 
 if (php_sapi_name() !== 'cli') {
 
-    if (IS_DEV) {  // A full featured error handler for dev env
+    if ($_ENV['IS_DEV']) {  // A full featured error handler for dev env
         $whoops = new \Whoops\Run;
         $handler = new \Whoops\Handler\PrettyPageHandler;
         $handler->setEditor('sublime');
