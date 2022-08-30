@@ -20,9 +20,6 @@ define('PUB', ROOT.'/public');
 // Require env specific config
 @include ROOT.'/.env/env.php';
 
-// Set up some constants
-require 'config/constants.php';
-
 // Load the composer autoloader
 $loader = require 'config/autoload.php';
 
