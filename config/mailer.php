@@ -1,80 +1,27 @@
 <?php
-
+use pp\Mailer;
 use Symfony\Component\Mailer\Transport;
-use Symfony\Component\Mailer\Mailer;
-
-$transport = Transport::fromDsn($_ENV['MAILER_DNS']);
-$mailer = new Mailer($transport);
-
-return $mailer;
-
-///////////////////////
-
+use Symfony\Component\Mailer\Mailer as sfMailer;
 use Symfony\Component\Mime\Email;
-use Pelago\Emogrifier\CssInliner;
 
-function send_mail(
-    string|array $to, 
-    string $subject, 
-    string $message = null, 
-    array $context = null, 
-    string $html = null, 
-    string $text = null,
-    string|array $cc = null,
-    string|array $bcc = null,
-    string|array $replyTo = null,
-    string|array $from = null,
-    string|array $attach = null
 
-) {
+// Symfony mailer setup. 
+// @See: https://symfony.com/doc/current/mailer.html
 
-    static $cids = [];
+$transport = Transport::fromDsn($_ENV['MAILER_DSN']);
+$mailer = new sfMailer($transport);
 
-    $mail = (new Email)
-        ->to(...(array) $to)
-        ->subject($subject);
+return new class ($mailer, $_ENV['BASE_URL'], PUB) extends Mailer
+{
 
-    $cc && $mail->cc(...(array) $cc);
-    $bcc && $mail->bcc(...(array) $bcc);
-    $replyTo && $mail->replyTo(...(array) $replyTo);
-    $from && $mail->from(...(array) $from);
-
-    $attach && array_map([$mail, 'attachFromPath'], (array) $attach);
-
-    $html && $mail->html($html);
-    $text && $mail->text($text);
-
-    if ($message && is_string($message)) {
-
-        extract($context, EXTR_SKIP);
-        ob_start();
-        require $message;
-        $message = ob_get_clean();
-        $message = CssInliner::fromHtml($message)->inlineCss($css)->render();
-        $base = url();
-        if (preg_match_all('#(<[^>]+(?src|background)=)["\'](.*)["\']#Ui', $message, $images)) {
-            foreach ($images[2] as $index => $url) {
-                if (strpos($url, $base)) {
-
-                    $cid = str_replace([$base, parse_url($url, PHP_URL_QUERY)], '', $url);
-                    $path = PUB . '/' . $cid;
-
-                    if (!isset($cids[$cid])) {
-                        $cids[$cid] = true;
-                        $mail->attachFromPath($path, $cid);
-                    }
-
-                    $message = str_replace(
-                        $images[0][$index], 
-                        $images[1][$index]."'cid:$cid'",
-                        $message);
-                }
-            }
-
-        }
-
-        $mail->html($message);
-
+    // Default email message
+    function newEmail(): Email
+    {
+        return (new Email)
+            ->from('Me <me@example.com>')
+            ->sender('Me <me@example.com>')
+            ->replyTo('Me <me@example.com>')
+            ->to('Me <me@example.com>');
     }
 
-}
+};
