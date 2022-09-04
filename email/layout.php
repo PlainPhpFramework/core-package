@@ -35,7 +35,7 @@ $content = get_ob();
 
 		<div class="header">
 			<a href="<?=url()?>" target="_blank">
-				<img src="<?=asset('assets/image.logo.png')?>">
+				<img src="<?=asset('assets/logo.email.png')?>">
 			</a>
 		</div>
 
