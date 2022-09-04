@@ -1,12 +1,17 @@
 {
     "name": "plainphp/core-package",
     "type": "plainphp-package",
-    "autoload": {
-        "classmap": ["lib/"]
-    },
     "bin": ["bin/plainphp-post-package-update.php"],
     "require": {
         "plainphp/package-installer": "dev-main"
+    },
+    "autoload": {
+        "classmap": [
+            "lib/"
+        ],
+        "files": [
+            "lib/functions.php"
+        ]
     },
     "keywords": ["plainphp", "framework", "package"]
 }
