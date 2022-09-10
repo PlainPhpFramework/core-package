@@ -16,7 +16,7 @@
     "keywords": ["plainphp", "framework", "package"],
     "extra": {
         "branch-alias": {
-            "dev-master": "1.0.x-dev"
+            "dev-main": "1.0.x-dev"
         }
     }
 }
