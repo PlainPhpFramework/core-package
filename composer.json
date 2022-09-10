@@ -3,7 +3,7 @@
     "type": "plainphp-package",
     "bin": ["bin/plainphp-post-package-update.php"],
     "require": {
-        "plainphp/package-installer": "dev-main"
+        "plainphp/package-installer": "dev-main@dev"
     },
     "autoload": {
         "classmap": [

@@ -27,6 +27,17 @@ $content = get_ob();
 		padding-top: 20px;
 		padding-bottom: 20px;
 	}
+
+	h1 {
+		font-size: 20px; font-weight: 300;
+	}
+
+	.btn {
+		color:#fff;display:inline-block;padding:7px 15px;font-weight:600;background: #007bff; color:#fff;text-decoration:none;border-radius: 5px;
+	}
+
+	.text-center{ text-align: center;}
+
 </style>
 
 <div class="container">
@@ -35,7 +46,7 @@ $content = get_ob();
 
 		<div class="header">
 			<a href="<?=url()?>" target="_blank">
-				<img src="<?=asset('assets/logo.email.png')?>">
+				<img src="<?=asset('assets/images/logo.email.png')?>">
 			</a>
 		</div>
 
