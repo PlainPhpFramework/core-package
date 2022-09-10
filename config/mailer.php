@@ -1,7 +1,7 @@
 <?php
 use pp\Mailer;
 use Symfony\Component\Mailer\Transport;
-use Symfony\Component\Mailer\Mailer as sfMailer;
+use Symfony\Component\Mailer\Mailer as SymfonyMailer;
 use Symfony\Component\Mime\Email;
 
 
@@ -9,7 +9,7 @@ use Symfony\Component\Mime\Email;
 // @See: https://symfony.com/doc/current/mailer.html
 
 $transport = Transport::fromDsn($_ENV['MAILER_DSN']);
-$mailer = new sfMailer($transport);
+$mailer = new SymfonyMailer($transport);
 
 return new class ($mailer, $_ENV['BASE_URL'], PUB) extends Mailer
 {

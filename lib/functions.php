@@ -12,7 +12,8 @@
  * 
  * // Load the db object defined in config/db.php
  */
-function get($name) {
+function get($name) 
+{
 	static $loaded = [];
 
 	// The config is not already loaded
@@ -55,17 +56,18 @@ function abort(int $statusCode = 404, Throwable $exception = null)
 
 }
 
-function redirect(string $location, int $statusCode = 302) {
+function redirect(string $location, int $statusCode = 302) 
+{
 	header('Location: '.$location, true, $statusCode);
 	die;
 }
-
 
 function redirect_for($name, array $args = [], int $statusCode = 302) {
 	redirect(url_for($name, $args), $statusCode);
 }
 
-function url($path = null, array $args = []) {
+function url($path = null, array $args = []) 
+{
     $url = $_ENV['BASE_URL'] . ltrim($path, '/');
     if ($args) {
     	$url .= '?'.http_build_query($args); 
@@ -73,76 +75,49 @@ function url($path = null, array $args = []) {
     return $url;
 }
 
-function url_for($name, array $args = []) {
-	static $map, $paramRegex, $defaultAction;
+function url_for($name, array $args = []) 
+{
 
-	if (!is_array($map)) {
-
-		// [controller/action => pattern, ...]
-		$map = array_flip(get('routing')->routes);
-
-		// Defined parameters :(id|slug|...)
-		$paramRegex = ':('.implode('|', array_keys(get('routing')->params)).')\??';
-
-		// The default action
-		$defaultAction = '/'.ltrim(get('routing')->default_action, '/');
-
-	}
-
-	$name = ltrim($name, '/');
-
-	// The controller/action is rewritten
-	if (isset($map[$name])) {
-
-		// List of the parameters in the pattern
-		$url = $map[$name];
-		$paramsInPattern = preg_match_all("#$paramRegex#", $url, $matches);
-		foreach($matches[1] as $match) {
-			$url = str_replace(':'.$match, @$args[$match], $url);
-			unset($args[$match]);
-		}
-		$url = str_replace('?', '', $url);
-
-	} else {
-		$url = $name;
-		if (substr($url, -strlen($defaultAction)) === $defaultAction) {
-			$url = substr($url, 0, -strlen($defaultAction)+1);
-		}
-	}
-
-    return url($url, $args);
+	return url(get('routing')->reverse($name, $args));
 
 }
 
-function current_url(array $args = []) {
+function current_url(array $args = []) 
+{
     return url($_SERVER['PATH_INFO'], $args);
 }
 
-function asset($path) {
+function asset($path) 
+{
     $source = PUB . '/' . ltrim($path, '/');
     return url($path) . '?' . filemtime($source);
 }
 
-function slugify($text, $separator = '-') {
+function slugify($text, $separator = '-') 
+{
     return get('slugify')->slugify($text, $separator);
 }
 
-function e($string) {
+function e($string)
+{
 	return htmlspecialchars($string, ENT_QUOTES|ENT_HTML5, 'UTF-8');
 }
 
-function render($template, array $vars = []) {
+function render($template, array $vars = [])
+{
 	extract($vars);
 	include $template;
 }
 
-function fetch($template, array $vars = []) {
+function fetch($template, array $vars = [])
+{
 	ob_start();
 	render($template, $vars);
 	return ob_get_clean();
 }
 
-function get_ob() {
+function get_ob()
+{
 	$ob = ob_get_clean();
 	ob_start();
 	return $ob;
