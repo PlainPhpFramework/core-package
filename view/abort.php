@@ -12,7 +12,7 @@ $title = sprintf('Error %s', $statusCode);
 	    <a class="btn btn-primary" href="mailto:<?=get('config')->webmaster_email?>" role="button">Report a problem</a>
 	<?php endif ?>
 
-    <?php if (IS_DEV): ?>
+    <?php if ($_ENV['IS_DEV']): ?>
 		<p class="mt-4 text-left">Debug information:</p>
 		<div class="text-left"><?php var_dump($exception) ?></div>
     <?php endif ?>
