@@ -75,11 +75,9 @@ function url($path = null, array $args = [])
     return $url;
 }
 
-function url_for($name, array $args = []) 
+function url_for(string|array $name, array $args = []) 
 {
-
 	return url(get('routing')->reverse($name, $args));
-
 }
 
 function current_url(array $args = []) 

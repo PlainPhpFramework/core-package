@@ -68,7 +68,7 @@ if (php_sapi_name() !== 'cli') {
 // Load the hooks
 require 'config/hooks.php';
 foreach (array_merge(glob(ROOT.'/packages/hooks/*.php'), glob(ROOT.'/app/hooks/*.php')) as $hook) {
-    require 'hooks/'.basename($hook);
+    require_once 'hooks/'.basename($hook);
 }
 
 // Set up the locale

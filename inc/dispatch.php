@@ -12,26 +12,28 @@ $router = require 'config/routing.php';
 list($controller, $method) = $router->dispatch($_SERVER['PATH_INFO'], $params);
 
 // Redirect to the canonical URL
-$canonicalUrl = url_for($controller . '/' . $method, $_GET + $params);
-if ($canonicalUrl !== current_url()) {
+$canonicalUrl = url_for([$controller, substr($method, 0, -5)], (array) $_GET + (array) $params);
+if ($canonicalUrl !== current_url($_GET)) {
     redirect($canonicalUrl, $_ENV['IS_DEV']? 302: 301);
 }
-
-$controller = sprintf('\\App\\Controller\\%s_controller', str_replace('/', '\\', $controller));
-$method .= '_http';
 
 if (class_exists($controller) && method_exists($controller, $method)) {
 
     Hook::trigger('before_dispatch');
 
     // Run controller
-    $_GET += $params;
+    if ($params) {
+        $_GET += $params;
+    }
     (new $controller)->{$method}();  
     
     Hook::trigger('after_dispatch');
     die;
 
+} elseif ('/' !== substr($_SERVER['PATH_INFO'], -1)) {
+    redirect(url($_SERVER['PATH_INFO'] . '/', $_GET));
 }
+
 
 Hook::trigger('dispatch_error');
 
