@@ -74,6 +74,9 @@ foreach (array_merge(glob(ROOT.'/packages/hooks/*.php'), glob(ROOT.'/app/hooks/*
 // Set up the locale
 require 'config/locale.php';
 
+// Start the session
+get('session');
+
 // Initialize the "template engine"
 ob_start();
 
